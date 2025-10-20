@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🐍 Пошаговая Змейка</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #0f3460;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial;
+        }
+        .game-container {
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            color: white;
+            margin-bottom: 10px;
+        }
+        .score {
+            color: #4CAF50;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        canvas {
+            border: 3px solid #4CAF50;
+            border-radius: 10px;
+            background: #1a1a2e;
+        }
+        .controls {
+            margin-top: 20px;
+            color: white;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background: #4CAF50;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .mobile-controls {
+            display: none;
+            margin-top: 20px;
+        }
+        .mobile-controls button {
+            width: 60px;
+            height: 60px;
+            font-size: 20px;
+        }
+        .instructions {
+            color: #ccc;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        @media (max-width: 600px) {
+            .mobile-controls {
+                display: grid;
+                grid-template-areas: 
+                    ". up ."
+                    "left . right"
+                    ". down .";
+                gap: 10px;
+            }
+            .up { grid-area: up; }
+            .down { grid-area: down; }
+            .left { grid-area: left; }
+            .right { grid-area: right; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🐍 Пошаговая Змейка</h1>
+        <div class="score">Очки: <span id="score">0</span></div>
+        <canvas id="gameBoard" width="300" height="300"></canvas>
+        
+        <div class="controls">
+            <p>Нажимайте стрелки для движения</p>
+            <p class="instructions">Каждое нажатие = 1 шаг</p>
+            <button onclick="resetGame()">Новая игра</button>
+        </div>
+        
+        <div class="mobile-controls">
+            <button class="up" onclick="makeMove('UP')">↑</button>
+            <button class="down" onclick="makeMove('DOWN')">↓</button>
+            <button class="left" onclick="makeMove('LEFT')">←</button>
+            <button class="right" onclick="makeMove('RIGHT')">→</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameBoard');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+
+        const gridSize = 20;
+        const tileCount = canvas.width / gridSize;
+
+        let snake = [{x: 10, y: 10}];
+        let food = {x: 5, y: 5};
+        let dx = 0;
+        let dy = 0;
+        let score = 0;
+        let gameRunning = true;
+        let lastDirection = null;
+
+        function initGame() {
+            snake = [{x: 10, y: 10}];
+            createFood();
+            dx = 0;
+            dy = 0;
+            score = 0;
+            scoreElement.textContent = score;
+            gameRunning = true;
+            lastDirection = null;
+            drawGame();
+        }
+
+        function createFood() {
+            let newFood;
+            let foodOnSnake;
+            
+            do {
+                foodOnSnake = false;
+                newFood = {
+                    x: Math.floor(Math.random() * tileCount),
+                    y: Math.floor(Math.random() * tileCount)
+                };
+                
+                // Проверяем, чтобы еда не появилась на змейке
+                for (let segment of snake) {
+                    if (segment.x === newFood.x * gridSize && segment.y === newFood.y * gridSize) {
+                        foodOnSnake = true;
+                        break;
+                    }
+                }
+            } while (foodOnSnake);
+            
+            food = {
+                x: newFood.x * gridSize,
+                y: newFood.y * gridSize
+            };
+        }
+
+        function makeMove(direction) {
+            if (!gameRunning) return;
+            
+            const currentDx = dx;
+            const currentDy = dy;
+            let newDx = dx;
+            let newDy = dy;
+            
+            switch(direction) {
+                case 'UP':
+                    if (currentDy !== gridSize) {
+                        newDx = 0; 
+                        newDy = -gridSize; 
+                        lastDirection = 'UP';
+                    }
+                    break;
+                case 'DOWN':
+                    if (currentDy !== -gridSize) {
+                        newDx = 0; 
+                        newDy = gridSize; 
+                        lastDirection = 'DOWN';
+                    }
+                    break;
+                case 'LEFT':
+                    if (currentDx !== gridSize) {
+                        newDx = -gridSize; 
+                        newDy = 0; 
+                        lastDirection = 'LEFT';
+                    }
+                    break;
+                case 'RIGHT':
+                    if (currentDx !== -gridSize) {
+                        newDx = gridSize; 
+                        newDy = 0; 
+                        lastDirection = 'RIGHT';
+                    }
+                    break;
+            }
+            
+            // ВСЕГДА делаем ход при нажатии
+            dx = newDx;
+            dy = newDy;
+            
+            // Если змейка двигается (не стоит на месте)
+            if (dx !== 0 || dy !== 0) {
+                moveSnake();
+            }
+        }
+
+        function moveSnake() {
+            if (!gameRunning) return;
+
+            const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+            
+            // Проверка границ
+            if (head.x < 0) head.x = canvas.width - gridSize;
+            if (head.x >= canvas.width) head.x = 0;
+            if (head.y < 0) head.y = canvas.height - gridSize;
+            if (head.y >= canvas.height) head.y = 0;
+            
+            // Проверка столкновения с собой
+            for (let i = 0; i < snake.length; i++) {
+                if (snake[i].x === head.x && snake[i].y === head.y) {
+                    gameOver();
+                    return;
+                }
+            }
+            
+            snake.unshift(head);
+            
+            // УЛУЧШЕННАЯ ПРОВЕРКА СЪЕДАНИЯ ЕДЫ
+            // Проверяем точное совпадение координат
+            const headGridX = head.x / gridSize;
+            const headGridY = head.y / gridSize;
+            const foodGridX = food.x / gridSize;
+            const foodGridY = food.y / gridSize;
+            
+            console.log(`Голова: (${headGridX}, ${headGridY}), Еда: (${foodGridX}, ${foodGridY})`);
+            
+            if (headGridX === foodGridX && headGridY === foodGridY) {
+                score += 10;
+                scoreElement.textContent = score;
+                console.log(`Съели еду! Очки: ${score}`);
+                createFood();
+            } else {
+                snake.pop();
+            }
+            
+            drawGame();
+        }
+
+        function drawGame() {
+            // Очистка
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Еда (рисуем больше для наглядности)
+            ctx.fillStyle = '#ff4444';
+            ctx.beginPath();
+            ctx.arc(food.x + gridSize/2, food.y + gridSize/2, gridSize/2 - 1, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Подсветка клетки с едой (для отладки)
+            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+            ctx.strokeRect(food.x, food.y, gridSize, gridSize);
+            
+            // Змейка
+            snake.forEach((segment, index) => {
+                if (index === 0) {
+                    // Голова
+                    ctx.fillStyle = '#4CAF50';
+                    ctx.fillRect(segment.x + 1, segment.y + 1, gridSize-2, gridSize-2);
+                    
+                    // Глаза
+                    ctx.fillStyle = 'black';
+                    ctx.fillRect(segment.x + 4, segment.y + 4, 4, 4);
+                    ctx.fillRect(segment.x + gridSize - 8, segment.y + 4, 4, 4);
+                } else {
+                    // Тело
+                    ctx.fillStyle = '#45a049';
+                    ctx.fillRect(segment.x + 1, segment.y + 1, gridSize-2, gridSize-2);
+                }
+            });
+        }
+
+        function gameOver() {
+            gameRunning = false;
+            ctx.fillStyle = 'rgba(255, 0, 0, 0.7)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = 'white';
+            ctx.font = '24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('ИГРА ОКОНЧЕНА!', canvas.width/2, canvas.height/2 - 15);
+            ctx.fillText(`Очки: ${score}`, canvas.width/2, canvas.height/2 + 15);
+        }
+
+        document.addEventListener('keydown', function(e) {
+            switch(e.key) {
+                case 'ArrowUp': 
+                    e.preventDefault();
+                    makeMove('UP'); 
+                    break;
+                case 'ArrowDown': 
+                    e.preventDefault();
+                    makeMove('DOWN'); 
+                    break;
+                case 'ArrowLeft': 
+                    e.preventDefault();
+                    makeMove('LEFT'); 
+                    break;
+                case 'ArrowRight': 
+                    e.preventDefault();
+                    makeMove('RIGHT'); 
+                    break;
+            }
+        });
+
+        function resetGame() {
+            initGame();
+        }
+
+        // Запускаем игру при загрузке
+        initGame();
+    </script>
+</body>
+</html>
