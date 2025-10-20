@@ -1,7 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>🐍 Пошаговая Змейка</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Змейка от Мирона - Классическая игра Змейка онлайн</title>
+    <meta name="description" content="Играйте в Змейку от Мирона. Классическая игра змейка с современной графикой. Управляйте змейкой, собирайте яблоки и устанавливайте рекорды!">
+    <meta name="keywords" content="змейка от мирона, змейка, игра змейка, snake game, мирон, классическая змейка">
+    <meta name="author" content="Мирон">
+    
     <style>
         body {
             margin: 0;
@@ -11,7 +17,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            font-family: Arial;
+            font-family: Arial, sans-serif;
         }
         .game-container {
             text-align: center;
@@ -19,9 +25,16 @@
             padding: 20px;
             border-radius: 15px;
             backdrop-filter: blur(10px);
+            max-width: 400px;
         }
         h1 {
             color: white;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .creator {
+            color: #4CAF50;
+            font-size: 18px;
             margin-bottom: 10px;
         }
         .score {
@@ -33,6 +46,8 @@
             border: 3px solid #4CAF50;
             border-radius: 10px;
             background: #1a1a2e;
+            display: block;
+            margin: 0 auto;
         }
         .controls {
             margin-top: 20px;
@@ -48,53 +63,34 @@
             font-size: 16px;
             cursor: pointer;
         }
-        .mobile-controls {
-            display: none;
+        .seo-text {
+            color: white;
             margin-top: 20px;
-        }
-        .mobile-controls button {
-            width: 60px;
-            height: 60px;
-            font-size: 20px;
-        }
-        .instructions {
-            color: #ccc;
-            margin-top: 10px;
             font-size: 14px;
-        }
-        @media (max-width: 600px) {
-            .mobile-controls {
-                display: grid;
-                grid-template-areas: 
-                    ". up ."
-                    "left . right"
-                    ". down .";
-                gap: 10px;
-            }
-            .up { grid-area: up; }
-            .down { grid-area: down; }
-            .left { grid-area: left; }
-            .right { grid-area: right; }
+            line-height: 1.5;
+            text-align: left;
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <h1>🐍 Пошаговая Змейка</h1>
+        <h1>🐍 Змейка</h1>
+        <div class="creator">от Мирона</div>
         <div class="score">Очки: <span id="score">0</span></div>
         <canvas id="gameBoard" width="300" height="300"></canvas>
         
         <div class="controls">
-            <p>Нажимайте стрелки для движения</p>
-            <p class="instructions">Каждое нажатие = 1 шаг</p>
+            <p>Управление: стрелки клавиатуры</p>
             <button onclick="resetGame()">Новая игра</button>
         </div>
         
-        <div class="mobile-controls">
-            <button class="up" onclick="makeMove('UP')">↑</button>
-            <button class="down" onclick="makeMove('DOWN')">↓</button>
-            <button class="left" onclick="makeMove('LEFT')">←</button>
-            <button class="right" onclick="makeMove('RIGHT')">→</button>
+        <div class="seo-text">
+            <h3>Змейка от Мирона - классическая аркадная игра</h3>
+            <p><strong>Змейка от Мирона</strong> - это современная версия классической игры змейка. Игрок управляет змейкой с помощью клавиш-стрелок, собирает яблоки и увеличивает свой счет. Особенности игры Змейка от Мирона: современная графика, адаптивный дизайн, простое управление. Игра полностью бесплатна и не требует регистрации.</p>
+            <p>Если вы ищете <strong>Змейку от Мирона</strong> - вы нашли правильное место! Эта версия игры создана с любовью к классическим аркадным играм.</p>
         </div>
     </div>
 
@@ -112,7 +108,6 @@
         let dy = 0;
         let score = 0;
         let gameRunning = true;
-        let lastDirection = null;
 
         function initGame() {
             snake = [{x: 10, y: 10}];
@@ -122,7 +117,6 @@
             score = 0;
             scoreElement.textContent = score;
             gameRunning = true;
-            lastDirection = null;
             drawGame();
         }
 
@@ -137,7 +131,6 @@
                     y: Math.floor(Math.random() * tileCount)
                 };
                 
-                // Проверяем, чтобы еда не появилась на змейке
                 for (let segment of snake) {
                     if (segment.x === newFood.x * gridSize && segment.y === newFood.y * gridSize) {
                         foodOnSnake = true;
@@ -157,45 +150,34 @@
             
             const currentDx = dx;
             const currentDy = dy;
-            let newDx = dx;
-            let newDy = dy;
             
             switch(direction) {
                 case 'UP':
                     if (currentDy !== gridSize) {
-                        newDx = 0; 
-                        newDy = -gridSize; 
-                        lastDirection = 'UP';
+                        dx = 0; 
+                        dy = -gridSize; 
                     }
                     break;
                 case 'DOWN':
                     if (currentDy !== -gridSize) {
-                        newDx = 0; 
-                        newDy = gridSize; 
-                        lastDirection = 'DOWN';
+                        dx = 0; 
+                        dy = gridSize; 
                     }
                     break;
                 case 'LEFT':
                     if (currentDx !== gridSize) {
-                        newDx = -gridSize; 
-                        newDy = 0; 
-                        lastDirection = 'LEFT';
+                        dx = -gridSize; 
+                        dy = 0; 
                     }
                     break;
                 case 'RIGHT':
                     if (currentDx !== -gridSize) {
-                        newDx = gridSize; 
-                        newDy = 0; 
-                        lastDirection = 'RIGHT';
+                        dx = gridSize; 
+                        dy = 0; 
                     }
                     break;
             }
             
-            // ВСЕГДА делаем ход при нажатии
-            dx = newDx;
-            dy = newDy;
-            
-            // Если змейка двигается (не стоит на месте)
             if (dx !== 0 || dy !== 0) {
                 moveSnake();
             }
@@ -206,13 +188,11 @@
 
             const head = {x: snake[0].x + dx, y: snake[0].y + dy};
             
-            // Проверка границ
             if (head.x < 0) head.x = canvas.width - gridSize;
             if (head.x >= canvas.width) head.x = 0;
             if (head.y < 0) head.y = canvas.height - gridSize;
             if (head.y >= canvas.height) head.y = 0;
             
-            // Проверка столкновения с собой
             for (let i = 0; i < snake.length; i++) {
                 if (snake[i].x === head.x && snake[i].y === head.y) {
                     gameOver();
@@ -222,19 +202,14 @@
             
             snake.unshift(head);
             
-            // УЛУЧШЕННАЯ ПРОВЕРКА СЪЕДАНИЯ ЕДЫ
-            // Проверяем точное совпадение координат
             const headGridX = head.x / gridSize;
             const headGridY = head.y / gridSize;
             const foodGridX = food.x / gridSize;
             const foodGridY = food.y / gridSize;
             
-            console.log(`Голова: (${headGridX}, ${headGridY}), Еда: (${foodGridX}, ${foodGridY})`);
-            
             if (headGridX === foodGridX && headGridY === foodGridY) {
                 score += 10;
                 scoreElement.textContent = score;
-                console.log(`Съели еду! Очки: ${score}`);
                 createFood();
             } else {
                 snake.pop();
@@ -244,33 +219,34 @@
         }
 
         function drawGame() {
-            // Очистка
             ctx.fillStyle = '#1a1a2e';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Еда (рисуем больше для наглядности)
             ctx.fillStyle = '#ff4444';
             ctx.beginPath();
             ctx.arc(food.x + gridSize/2, food.y + gridSize/2, gridSize/2 - 1, 0, 2 * Math.PI);
             ctx.fill();
             
-            // Подсветка клетки с едой (для отладки)
-            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-            ctx.strokeRect(food.x, food.y, gridSize, gridSize);
-            
-            // Змейка
             snake.forEach((segment, index) => {
                 if (index === 0) {
-                    // Голова
                     ctx.fillStyle = '#4CAF50';
                     ctx.fillRect(segment.x + 1, segment.y + 1, gridSize-2, gridSize-2);
                     
-                    // Глаза
                     ctx.fillStyle = 'black';
-                    ctx.fillRect(segment.x + 4, segment.y + 4, 4, 4);
-                    ctx.fillRect(segment.x + gridSize - 8, segment.y + 4, 4, 4);
+                    if (dx === gridSize) {
+                        ctx.fillRect(segment.x + gridSize - 8, segment.y + 5, 4, 4);
+                        ctx.fillRect(segment.x + gridSize - 8, segment.y + gridSize - 9, 4, 4);
+                    } else if (dx === -gridSize) {
+                        ctx.fillRect(segment.x + 4, segment.y + 5, 4, 4);
+                        ctx.fillRect(segment.x + 4, segment.y + gridSize - 9, 4, 4);
+                    } else if (dy === -gridSize) {
+                        ctx.fillRect(segment.x + 5, segment.y + 4, 4, 4);
+                        ctx.fillRect(segment.x + gridSize - 9, segment.y + 4, 4, 4);
+                    } else if (dy === gridSize) {
+                        ctx.fillRect(segment.x + 5, segment.y + gridSize - 8, 4, 4);
+                        ctx.fillRect(segment.x + gridSize - 9, segment.y + gridSize - 8, 4, 4);
+                    }
                 } else {
-                    // Тело
                     ctx.fillStyle = '#45a049';
                     ctx.fillRect(segment.x + 1, segment.y + 1, gridSize-2, gridSize-2);
                 }
@@ -314,7 +290,6 @@
             initGame();
         }
 
-        // Запускаем игру при загрузке
         initGame();
     </script>
 </body>
