@@ -63,6 +63,39 @@
             font-size: 16px;
             cursor: pointer;
         }
+        
+        /* Мобильные стрелки */
+        .mobile-controls {
+            display: none;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        .mobile-controls-grid {
+            display: grid;
+            grid-template-areas: 
+                ". up ."
+                "left . right"
+                ". down .";
+            gap: 10px;
+            margin: 0 auto;
+        }
+        .mobile-controls button {
+            width: 70px;
+            height: 70px;
+            font-size: 24px;
+            background: #4CAF50;
+            border: 2px solid white;
+            border-radius: 10px;
+        }
+        .mobile-controls button:active {
+            background: #45a049;
+            transform: scale(0.95);
+        }
+        .up { grid-area: up; }
+        .down { grid-area: down; }
+        .left { grid-area: left; }
+        .right { grid-area: right; }
+        
         .seo-text {
             color: white;
             margin-top: 20px;
@@ -72,6 +105,16 @@
             background: rgba(255,255,255,0.1);
             padding: 15px;
             border-radius: 10px;
+        }
+        
+        /* Показываем стрелки только на мобильных */
+        @media (max-width: 768px) {
+            .mobile-controls {
+                display: flex;
+            }
+            .game-container {
+                padding: 15px;
+            }
         }
     </style>
 </head>
@@ -85,6 +128,16 @@
         <div class="controls">
             <p>Управление: стрелки клавиатуры</p>
             <button onclick="resetGame()">Новая игра</button>
+        </div>
+        
+        <!-- Мобильные стрелки -->
+        <div class="mobile-controls">
+            <div class="mobile-controls-grid">
+                <button class="up" onclick="makeMove('UP')">↑</button>
+                <button class="down" onclick="makeMove('DOWN')">↓</button>
+                <button class="left" onclick="makeMove('LEFT')">←</button>
+                <button class="right" onclick="makeMove('RIGHT')">→</button>
+            </div>
         </div>
         
         <div class="seo-text">
